@@ -11,9 +11,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.gitfeeling.restadvertiser.common.TestUtil;
-import com.gitfeeling.restadvertiser.exception.AdvertiserServiceException;
 import com.gitfeeling.restadvertiser.model.Advertiser;
 import com.gitfeeling.restadvertiser.service.AdvertiserService;
+import com.gitfeeling.restadvertiser.service.AdvertiserServiceException;
+import com.gitfeeling.restadvertiser.service.AdvertiserServiceException.Status;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -100,12 +101,12 @@ public class AdvertiserResourceControllerTest {
     @Test
     public void testAdvertiserServiceExceptionIsHandledGracefully() throws Exception {
 	    	when(mockAdvertiserService.getAdvertiserByName(anyString()))
-	    		.thenThrow(new AdvertiserServiceException(404, "Advertiser not found"));
+	    		.thenThrow(new AdvertiserServiceException(Status.ADVERTISER_NOT_FOUND));
 	    	
 	    	mockMvc.perform(get("/api/advertisers/PNG"))
 	    			.andExpect(status().isNotFound())
-	    			.andExpect(jsonPath("$.status", is(404)))
-	    			.andExpect(jsonPath("$.description", is("Advertiser not found")));
+	    			.andExpect(jsonPath("$.status", is(Status.ADVERTISER_NOT_FOUND.code())))
+	    			.andExpect(jsonPath("$.description", is(Status.ADVERTISER_NOT_FOUND.description())));
     }
     
     @Test

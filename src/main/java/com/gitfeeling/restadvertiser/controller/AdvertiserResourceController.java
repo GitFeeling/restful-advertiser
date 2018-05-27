@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.gitfeeling.restadvertiser.exception.AdvertiserServiceException;
 import com.gitfeeling.restadvertiser.model.Advertiser;
 import com.gitfeeling.restadvertiser.service.AdvertiserService;
+import com.gitfeeling.restadvertiser.service.AdvertiserServiceException;
 
 @Controller
 @Description("A controller for handling requests for the Advertiser resource")

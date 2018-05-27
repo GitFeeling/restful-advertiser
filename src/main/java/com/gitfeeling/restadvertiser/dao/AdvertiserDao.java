@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -16,7 +18,14 @@ import com.gitfeeling.restadvertiser.model.Advertiser;
 public class AdvertiserDao {
 	
 	@Autowired
-	JdbcTemplate jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
+
+	/**
+	 * @param jdbcTemplate the jdbcTemplate to set
+	 */
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
 
 	class AdvertiserRowMapper implements RowMapper<Advertiser>{
 
@@ -36,22 +45,37 @@ public class AdvertiserDao {
 	}
 
 	public Advertiser findByName(String name) {
-		return jdbcTemplate.queryForObject("select * from advertiser where name=?", new Object[] { name },
-				new BeanPropertyRowMapper<Advertiser>(Advertiser.class));
+		try {
+			return jdbcTemplate.queryForObject(
+					"select * from advertiser where name=?", 
+					new Object[] { name },
+					new BeanPropertyRowMapper<Advertiser>(Advertiser.class));			
+		}
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
 	public int deleteByName(String name) {
-		return jdbcTemplate.update("delete from advertiser where name=?", new Object[] { name });
+		return jdbcTemplate.update(
+				"delete from advertiser where name=?", 
+				new Object[] { name });
 	}
-
-	public int insert(Advertiser advertiser) {
-		return jdbcTemplate.update("insert into advertiser (name, contact_name, credit_limit) " + "values(?,  ?, ?)",
-				new Object[] { advertiser.getName(), advertiser.getContactName(), advertiser.getCreditLimit() });
-	}
-
+	
 	public int update(Advertiser advertiser) {
-		return jdbcTemplate.update("update advertiser " + " set contact_name = ?, credit_limit = ? " + " where name = ?",
+		return jdbcTemplate.update(
+				"update advertiser " + " set contact_name = ?, credit_limit = ? " + " where name = ?",
 				new Object[] { advertiser.getContactName(), advertiser.getCreditLimit(), advertiser.getName() });
+	}	
+
+	public int insert(Advertiser advertiser) throws DuplicateEntityException {
+		try {
+			return jdbcTemplate.update(
+					"insert into advertiser (name, contact_name, credit_limit) " + "values(?,  ?, ?)",
+					new Object[] { advertiser.getName(), advertiser.getContactName(), advertiser.getCreditLimit() });			
+		} catch (DuplicateKeyException e) {
+			throw new DuplicateEntityException(e.getMessage());
+		}
 	}
 	
 }

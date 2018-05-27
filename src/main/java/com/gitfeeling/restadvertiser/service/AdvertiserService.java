@@ -6,42 +6,49 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gitfeeling.restadvertiser.dao.AdvertiserDao;
-import com.gitfeeling.restadvertiser.exception.AdvertiserServiceException;
+import com.gitfeeling.restadvertiser.dao.DuplicateEntityException;
 import com.gitfeeling.restadvertiser.model.Advertiser;
+import com.gitfeeling.restadvertiser.service.AdvertiserServiceException.Status;
 
 @Service
 public class AdvertiserService {
 	
 	@Autowired
-	private AdvertiserDao advertiserDao; 
+	private AdvertiserDao advertiserDao;
 	
 	public List<Advertiser> getAllAdvertisers() {
-		return advertiserDao.findAll();
+		List<Advertiser> advertisers = advertiserDao.findAll();
+		return advertisers;
 	}
 	
 	public Advertiser getAdvertiserByName(String name) throws AdvertiserServiceException {
 		Advertiser advertiser = advertiserDao.findByName(name);
 		if (advertiser == null) {
-			throw new AdvertiserServiceException(404, "Advertiser not found");
+			throw new AdvertiserServiceException(Status.ADVERTISER_NOT_FOUND);
 		}
 		return advertiser;
 	}
 	
 	public void addAdvertiser(Advertiser advertiser) throws AdvertiserServiceException {
-		if (advertiserDao.insert(advertiser) != 1) {
-			throw new AdvertiserServiceException(500, "Advertiser not inserted");
+		try {
+			advertiserDao.insert(advertiser);			
+		}
+		catch (DuplicateEntityException ex) {
+			throw new AdvertiserServiceException(Status.ADVERTISER_ALREADY_EXISTS);
 		}
 	}
 	
 	public void updateAdvertiser(Advertiser advertiser) throws AdvertiserServiceException {
-		if(advertiserDao.update(advertiser) != 1) {
-			throw new AdvertiserServiceException(404, "Advertiser not found");
+		int numberOfRowsUpdated = advertiserDao.update(advertiser);
+		if( numberOfRowsUpdated == 0) {
+			throw new AdvertiserServiceException(Status.ADVERTISER_NOT_FOUND);
 		}
 	}
 	
 	public void deleteAdvertiser(String name) throws AdvertiserServiceException {
-		if(advertiserDao.deleteByName(name) != 1) {
-			throw new AdvertiserServiceException(404, "Advertiser not found");
+		int numberOfRowsDeleted = advertiserDao.deleteByName(name);
+		if( numberOfRowsDeleted == 0) {
+			throw new AdvertiserServiceException(Status.ADVERTISER_NOT_FOUND);
 		}
 	}
 

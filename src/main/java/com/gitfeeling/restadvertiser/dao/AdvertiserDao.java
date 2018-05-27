@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -63,18 +64,26 @@ public class AdvertiserDao {
 	}
 	
 	public int update(Advertiser advertiser) {
+		if (advertiser == null) {
+			throw new IllegalArgumentException("Advertiser should be non null");
+		}
 		return jdbcTemplate.update(
 				"update advertiser " + " set contact_name = ?, credit_limit = ? " + " where name = ?",
 				new Object[] { advertiser.getContactName(), advertiser.getCreditLimit(), advertiser.getName() });
 	}	
 
-	public int insert(Advertiser advertiser) throws DuplicateEntityException {
+	public int insert(Advertiser advertiser) throws DuplicateEntityException, DataIntegrityException {
+		if (advertiser == null) {
+			throw new IllegalArgumentException("Advertiser should be non null");
+		}
 		try {
 			return jdbcTemplate.update(
 					"insert into advertiser (name, contact_name, credit_limit) " + "values(?,  ?, ?)",
 					new Object[] { advertiser.getName(), advertiser.getContactName(), advertiser.getCreditLimit() });			
 		} catch (DuplicateKeyException e) {
 			throw new DuplicateEntityException(e.getMessage());
+		} catch (DataIntegrityViolationException e) {
+			throw new DataIntegrityException(e.getMessage());
 		}
 	}
 	

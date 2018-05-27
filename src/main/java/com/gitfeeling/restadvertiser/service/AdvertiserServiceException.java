@@ -19,7 +19,9 @@ public class AdvertiserServiceException extends Exception {
 		
 		ADVERTISER_NOT_FOUND(404, "Advertiser not found"),
 		
-		ADVERTISER_ALREADY_EXISTS(409, "Advertiser already exists");
+		ADVERTISER_ALREADY_EXISTS(409, "Advertiser already exists"),
+		
+		ADVERTISER_MISSING_NAME(422, "Advertiser does not contain mandatory property - name");
 			
         private final int code;
 

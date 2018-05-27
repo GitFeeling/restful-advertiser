@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gitfeeling.restadvertiser.dao.AdvertiserDao;
+import com.gitfeeling.restadvertiser.dao.DataIntegrityException;
 import com.gitfeeling.restadvertiser.dao.DuplicateEntityException;
 import com.gitfeeling.restadvertiser.model.Advertiser;
 import com.gitfeeling.restadvertiser.service.AdvertiserServiceException.Status;
@@ -35,6 +36,8 @@ public class AdvertiserService {
 		}
 		catch (DuplicateEntityException ex) {
 			throw new AdvertiserServiceException(Status.ADVERTISER_ALREADY_EXISTS);
+		} catch (DataIntegrityException e) {
+			throw new AdvertiserServiceException(Status.ADVERTISER_MISSING_NAME);
 		}
 	}
 	

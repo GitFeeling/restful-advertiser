@@ -14,8 +14,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+
+import com.gitfeeling.restadvertiser.common.DBFactory;
 import com.gitfeeling.restadvertiser.model.Advertiser;
 
 public class AdvertiserDaoTest {
@@ -26,11 +26,7 @@ public class AdvertiserDaoTest {
 	
 	@BeforeClass
 	public static void setup() throws IOException {
-		EmbeddedDatabase db = new EmbeddedDatabaseBuilder()
-				.setType(EmbeddedDatabaseType.H2)
-	            .addScript("schema.sql")
-	            .addScript("data.sql")
-	            .build();
+		  EmbeddedDatabase db = DBFactory.getDB();
 	      dao = new AdvertiserDao();
 	      dao.setJdbcTemplate(new JdbcTemplate(db));
 	      
@@ -40,10 +36,7 @@ public class AdvertiserDaoTest {
 	      while((line = reader.readLine()) != null) {
 	    	  	String[] properties = line.split(",");
 	    	  	Advertiser advertiser = new Advertiser(
-		    	  			properties[0],
-		    	  			properties[1],
-		    	  			Integer.parseInt(properties[2])
-	    	  				);
+	    	  			properties[0], properties[1], Integer.parseInt(properties[2]), Integer.parseInt(properties[3]));
 	    	  	startingMap.put(advertiser.getName(), advertiser);
 	      }
 	      reader.close();
@@ -86,6 +79,7 @@ public class AdvertiserDaoTest {
 		
 		persistedAdvertiser.setContactName("Mr Do Little");
 		persistedAdvertiser.setCreditLimit(2000);
+		persistedAdvertiser.setBalance(500);
 		dao.update(persistedAdvertiser);
 		
 		Advertiser updatedAdvertiser = dao.findByName(persistedAdvertiser.getName());
@@ -97,7 +91,7 @@ public class AdvertiserDaoTest {
 	@Test
 	public void testInsertAndDelete() 
 			throws DuplicateEntityException, DataIntegrityException {
-		Advertiser advertiser = new Advertiser("DuggyDoLittle", "Mr Do Little", 2000);
+		Advertiser advertiser = new Advertiser("DuggyDoLittle", "Mr Do Little", 2000, 500);
 		dao.insert(advertiser);
 		assertEquals(advertiser, dao.findByName(advertiser.getName()));
 		
@@ -108,7 +102,7 @@ public class AdvertiserDaoTest {
 	@Test(expected = DuplicateEntityException.class)
 	public void testDuplicateInsertThrowsDuplicateEntityException() 
 			throws DuplicateEntityException, DataIntegrityException {
-		Advertiser inAdvertiser = new Advertiser("PNG", "DuggyDolittle", 2300);
+		Advertiser inAdvertiser = new Advertiser("PNG", "DuggyDolittle", 2000, 500);
 		assertEquals(1, dao.insert(inAdvertiser));
 		dao.insert(inAdvertiser);
 	}
@@ -128,7 +122,7 @@ public class AdvertiserDaoTest {
 	
 	@Test
 	public void testUpdateNotFoundReturns0() {
-		Advertiser advertiser = new Advertiser("NoGoodAdvertiser", "Mr. Knows Little", 0);
+		Advertiser advertiser = new Advertiser("NoGoodAdvertiser", "Mr. Knows Little", 0, 0);
 		assertTrue(dao.update(advertiser) == 0);
 	}
 	
@@ -139,7 +133,7 @@ public class AdvertiserDaoTest {
 	
 	@Test
 	public void testDeleteNotFoundReturns0() {
-		Advertiser advertiser = new Advertiser("NoGoodAdvertiser", "Mr. Knows Little", 0);
+		Advertiser advertiser = new Advertiser("NoGoodAdvertiser", "Mr. Knows Little", 0, 0);
 		assertTrue(dao.deleteByName(advertiser.getName()) == 0);
 	}
 	
@@ -147,6 +141,6 @@ public class AdvertiserDaoTest {
 	public void testDeleteNullInputReturns0() {
 		assertTrue(dao.deleteByName(null) == 0);
 	}
-
+	
 }
 

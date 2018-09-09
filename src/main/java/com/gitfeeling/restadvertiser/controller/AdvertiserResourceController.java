@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Description;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,9 +19,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.gitfeeling.restadvertiser.model.Advertiser;
+import com.gitfeeling.restadvertiser.model.CreditDTO;
 import com.gitfeeling.restadvertiser.model.ErrorResponse;
 import com.gitfeeling.restadvertiser.service.AdvertiserService;
 import com.gitfeeling.restadvertiser.service.AdvertiserServiceException;
+import com.gitfeeling.restadvertiser.service.CreditService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -35,9 +38,12 @@ public class AdvertiserResourceController {
 	   
 	private AdvertiserService advertiserService;
 	
+	private CreditService creditService;
+	
 	@Autowired
-	public AdvertiserResourceController(AdvertiserService advertiserService) {
+	public AdvertiserResourceController(AdvertiserService advertiserService, CreditService creditService) {
 		this.advertiserService = advertiserService;
+		this.creditService = creditService;
 	}
 	
 	@GetMapping
@@ -96,4 +102,10 @@ public class AdvertiserResourceController {
 	public void deleteAdvertiser(@PathVariable("name") String name) throws AdvertiserServiceException {
 		advertiserService.deleteAdvertiser(name);
 	}
+	
+	@PostMapping(value="/{name}/credit", consumes="application/json")
+	@ResponseStatus(HttpStatus.OK)
+	public void perform(@PathVariable("name") String name, @RequestBody CreditDTO creditDTO) {
+	}	
+
 }

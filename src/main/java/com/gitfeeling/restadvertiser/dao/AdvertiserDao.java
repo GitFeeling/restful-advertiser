@@ -36,6 +36,7 @@ public class AdvertiserDao {
 			advertiser.setName(rs.getString("name"));
 			advertiser.setContactName(rs.getString("contact_name"));
 			advertiser.setCreditLimit(rs.getInt("credit_limit"));
+			advertiser.setBalance(rs.getInt("balance"));
 			return advertiser;
 		}
 		
@@ -68,8 +69,8 @@ public class AdvertiserDao {
 			throw new IllegalArgumentException("Advertiser should be non null");
 		}
 		return jdbcTemplate.update(
-				"update advertiser " + " set contact_name = ?, credit_limit = ? " + " where name = ?",
-				new Object[] { advertiser.getContactName(), advertiser.getCreditLimit(), advertiser.getName() });
+				"update advertiser " + " set contact_name = ?, credit_limit = ? , balance = ?"  + " where name = ?",
+				new Object[] { advertiser.getContactName(), advertiser.getCreditLimit(), advertiser.getBalance(), advertiser.getName() });
 	}	
 
 	public int insert(Advertiser advertiser) throws DuplicateEntityException, DataIntegrityException {
@@ -78,8 +79,8 @@ public class AdvertiserDao {
 		}
 		try {
 			return jdbcTemplate.update(
-					"insert into advertiser (name, contact_name, credit_limit) " + "values(?,  ?, ?)",
-					new Object[] { advertiser.getName(), advertiser.getContactName(), advertiser.getCreditLimit() });			
+					"insert into advertiser (name, contact_name, credit_limit, balance) " + "values(?, ?, ?, ?)",
+					new Object[] { advertiser.getName(), advertiser.getContactName(), advertiser.getCreditLimit(), advertiser.getBalance() });			
 		} catch (DuplicateKeyException e) {
 			throw new DuplicateEntityException(e.getMessage());
 		} catch (DataIntegrityViolationException e) {

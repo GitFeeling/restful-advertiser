@@ -30,10 +30,10 @@ public class AdvertiserServiceTest {
 	
 	@Test
 	public void testGetAllAdvertisers() {
-		Advertiser first = new Advertiser("DrStrangelove", "Peter Sellers", 1000);
-		Advertiser second = new Advertiser("NuttyProfessor", "Eddie Murphy", 2000);
+		Advertiser first = new Advertiser("DrStrangelove", "Peter Sellers", 1000, 0);
+		Advertiser second = new Advertiser("NuttyProfessor", "Eddie Murphy", 2000, 500);
 		Advertiser third = new Advertiser();
-		third.setContactName("BigLwebowski");
+		third.setContactName("BigLebowski");
 		List<Advertiser> advertisers = Arrays.asList(first, second, third);
 		when(dao.findAll()).thenReturn(advertisers);
 		assertTrue(service.getAllAdvertisers().size() == 3);
@@ -42,7 +42,7 @@ public class AdvertiserServiceTest {
 	
 	@Test
 	public void testGetAdvertiserByName() throws AdvertiserServiceException {
-		Advertiser advertiser = new Advertiser("DrStrangelove", "Peter Sellers", 1000);
+		Advertiser advertiser = new Advertiser("DrStrangelove", "Peter Sellers", 1000, 500);
 		when(dao.findByName(advertiser.getName())).thenReturn(advertiser);
 		assertEquals(advertiser, service.getAdvertiserByName(advertiser.getName()));
 	}
@@ -60,14 +60,14 @@ public class AdvertiserServiceTest {
 	
 	@Test
 	public void testAddAdvertiser() throws DuplicateEntityException, DataIntegrityException, AdvertiserServiceException {
-		Advertiser advertiser = new Advertiser("DrStrangelove", "Peter Sellers", 1000);
+		Advertiser advertiser = new Advertiser("DrStrangelove", "Peter Sellers", 1000, 500);
 		when(dao.insert(advertiser)).thenReturn(1);
 		service.addAdvertiser(advertiser);
 	}
 	
 	@Test
 	public void testAddAdvertiserDuplicateThrowsAdvertiserServiceException() throws DuplicateEntityException, DataIntegrityException {
-		Advertiser advertiser = new Advertiser("DrStrangelove", "Peter Sellers", 1000);
+		Advertiser advertiser = new Advertiser("DrStrangelove", "Peter Sellers", 1000, 0);
 		when(dao.insert(advertiser)).thenThrow(DuplicateEntityException.class);
 		try {
 			service.addAdvertiser(advertiser);
@@ -78,7 +78,7 @@ public class AdvertiserServiceTest {
 	
 	@Test
 	public void testAddAdvertiserInvalidDataThrowsAdvertiserServiceException() throws DuplicateEntityException, DataIntegrityException {
-		Advertiser advertiser = new Advertiser(null, "Peter Sellers", 1000);
+		Advertiser advertiser = new Advertiser(null, "Peter Sellers", 1000, 500);
 		when(dao.insert(advertiser)).thenThrow(DataIntegrityException.class);
 		try {
 			service.addAdvertiser(advertiser);
@@ -89,14 +89,14 @@ public class AdvertiserServiceTest {
 	
 	@Test
 	public void updateAdvertiser() throws AdvertiserServiceException {
-		Advertiser advertiser = new Advertiser("DrStrangelove", "Peter Sellers", 1000);
+		Advertiser advertiser = new Advertiser("DrStrangelove", "Peter Sellers", 1000, 0);
 		when(dao.update(advertiser)).thenReturn(1);
 		service.updateAdvertiser(advertiser);
 	}
 	
 	@Test
 	public void updateAdvertiserNotFoundThrowsAdvertiserServiceException() {
-		Advertiser advertiser = new Advertiser("DrStrangelove", "Peter Sellers", 1000);
+		Advertiser advertiser = new Advertiser("DrStrangelove", "Peter Sellers", 1000, 500);
 		when(dao.update(advertiser)).thenReturn(0);
 		try {
 			service.updateAdvertiser(advertiser);			

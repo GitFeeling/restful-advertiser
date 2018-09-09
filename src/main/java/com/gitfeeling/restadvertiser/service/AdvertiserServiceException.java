@@ -21,7 +21,9 @@ public class AdvertiserServiceException extends Exception {
 		
 		ADVERTISER_ALREADY_EXISTS(409, "Advertiser already exists"),
 		
-		ADVERTISER_MISSING_NAME(422, "Advertiser does not contain mandatory property - name");
+		ADVERTISER_MISSING_NAME(422, "Advertiser does not contain mandatory property - name"),
+		
+		INSUFFICIENT_CREDIT(403, "Requested transaction amount exceeds credit");
 			
         private final int code;
 

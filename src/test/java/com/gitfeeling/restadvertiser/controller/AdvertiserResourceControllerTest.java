@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -45,8 +45,8 @@ public class AdvertiserResourceControllerTest {
 
     @Test
     public void testGetAllAdvertisersIsSuccess() throws Exception  {
-    		Advertiser first = new Advertiser("PNG", "DuggyDolittle", 2300);
-    		Advertiser second = new Advertiser("OMG", "DuggyDomuch", 2400);
+    		Advertiser first = new Advertiser("PNG", "DuggyDolittle", 2300, 0);
+    		Advertiser second = new Advertiser("OMG", "DuggyDomuch", 2400, 0);
         when(mockAdvertiserService.getAllAdvertisers()).thenReturn(Arrays.asList(first, second));
         mockMvc.perform(get("/api/advertisers"))
                 .andExpect(status().isOk())
@@ -54,26 +54,29 @@ public class AdvertiserResourceControllerTest {
                 .andExpect(jsonPath("$[0].name", is("PNG")))
                 .andExpect(jsonPath("$[0].contactName", is("DuggyDolittle")))
                 .andExpect(jsonPath("$[0].creditLimit", is(2300)))
+                .andExpect(jsonPath("$[0].balance", is(0)))
                 .andExpect(jsonPath("$[1].name", is("OMG")))
                 .andExpect(jsonPath("$[1].contactName", is("DuggyDomuch")))
-                .andExpect(jsonPath("$[1].creditLimit", is(2400)));
+                .andExpect(jsonPath("$[1].creditLimit", is(2400)))
+                .andExpect(jsonPath("$[1].balance", is(0)));
     }
     
     @Test
     public void testGetAdvertiserByNameIsSuccess() throws Exception {
-    		Advertiser advertiser = new Advertiser("PNG", "DuggyDolittle", 2300);
+    		Advertiser advertiser = new Advertiser("PNG", "DuggyDolittle", 2300, 0);
     		when(mockAdvertiserService.getAdvertiserByName("PNG")).thenReturn(advertiser);
     		mockMvc.perform(get("/api/advertisers/PNG"))
 	            .andExpect(status().isOk())
 	            .andExpect(jsonPath("$.name", is("PNG")))
 	            .andExpect(jsonPath("$.contactName", is("DuggyDolittle")))
-	            .andExpect(jsonPath("$.creditLimit", is(2300)));
+	            .andExpect(jsonPath("$.creditLimit", is(2300)))
+	            .andExpect(jsonPath("$.balance", is(0)));
     }
     
     
     @Test
     public void testAddAdvertiserIsSuccess() throws IOException, Exception {
-    		Advertiser advertiser = new Advertiser("PNG", "DuggyDolittle", 2300);
+    		Advertiser advertiser = new Advertiser("PNG", "DuggyDolittle", 2300, 0);
     		mockMvc.perform(post("/api/advertisers")
     				.contentType(MediaType.APPLICATION_JSON)
     				.content(TestUtil.convertObjectToJsonBytes(advertiser))
@@ -84,7 +87,7 @@ public class AdvertiserResourceControllerTest {
     
     @Test
     public void testUpdateAdvertiserIsSuccess() throws IOException, Exception {
-    		Advertiser advertiser = new Advertiser("PNG", "DuggyDolittle", 2300);
+    		Advertiser advertiser = new Advertiser("PNG", "DuggyDolittle", 2300, 0);
     		mockMvc.perform(put("/api/advertisers")
     				.contentType(MediaType.APPLICATION_JSON)
     				.content(TestUtil.convertObjectToJsonBytes(advertiser))
@@ -110,7 +113,7 @@ public class AdvertiserResourceControllerTest {
     }
     
     @Test
-    public void TestUnExpectedServerExceptionIsHandledGracefully() throws Exception {
+    public void testUnExpectedServerExceptionIsHandledGracefully() throws Exception {
      	when(mockAdvertiserService.getAdvertiserByName(anyString()))
 		.thenThrow(new NullPointerException());
 
